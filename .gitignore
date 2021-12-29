@@ -1,0 +1,7 @@
+.env
+credentials.ini
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+__pypackages__/

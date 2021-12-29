@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+    brevets:
+        build: brevets/.
+        command: python -u flask_brevets.py -P $BREVETS_PORT
+        ports:
+            - "5000:$BREVETS_PORT"
+        depends_on:
+            - api
+        environment:
+            API_ADDR: api
+            API_PORT: $API_PORT
+            PORT: $BREVETS_PORT
+            DEBUG: True
+    api:
+        build: api/.
+        command: python -u api.py -P $API_PORT
+        ports:
+            - "5001:$API_PORT"
+        depends_on:
+            - db
+        environment:
+            MONGODB_HOSTNAME: db
+            PORT: $API_PORT
+            DEBUG: True
+    db:
+        image: mongo:latest
