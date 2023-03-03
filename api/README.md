@@ -1,3 +1,3 @@
-# API #
+# API
 
-Implement your API service here.
+Implement your API here.

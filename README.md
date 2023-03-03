@@ -3,6 +3,12 @@ Brevet time calculator with MongoDB, and a RESTful API!
 
 Read about MongoEngine and Flask-RESTful before you start: [http://docs.mongoengine.org/](http://docs.mongoengine.org/), [https://flask-restful.readthedocs.io/en/latest/](https://flask-restful.readthedocs.io/en/latest/).
 
+## Before you begin
+You *HAVE TO* copy `.env-example` into `.env` and specify your container port numbers there!
+Note that the default values (5000 and 5000) will work!
+
+*DO NOT PLACE LOCAL PORTS IN YOUR COMPOSE FILE!*
+
 ## Overview
 
 You will reuse your code from Project 5, which already has two services:
