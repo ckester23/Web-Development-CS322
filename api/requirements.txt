@@ -2,4 +2,3 @@ Flask
 flask-restful
 pymongo
 mongoengine
-nose
