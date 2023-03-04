@@ -7,7 +7,8 @@ from flask_restful import Api
 from mongoengine import connect
 # You need to implement two resources: Brevet and Brevets.
 # Uncomment when done:
-# from resources import Brevet, Brevets
+# from resources.brevet import Brevet
+# from resources.brevets import Brevets
 
 # Connect MongoEngine to mongodb
 connect(host=f"mongodb://{os.environ['MONGODB_HOSTNAME']}:27017/brevetsdb")
