@@ -7,6 +7,19 @@ from flask_restful import Resource
 # You need to implement this in database/models.py
 from database.models import Brevet
 
+class Brevet(Resource):
+    def get(self, _id):
+        pass
+
+    def put(self, _id):
+        pass
+
+    def delete(self, _id):
+        pass
+
+
+
+
 # MongoEngine queries:
 # Brevet.objects() : similar to find_all. Returns a MongoEngine query
 # Brevet(...).save() : creates new brevet
