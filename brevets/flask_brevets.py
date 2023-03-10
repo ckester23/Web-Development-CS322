@@ -3,21 +3,55 @@ Replacement for RUSA ACP brevet time calculator
 (see https://rusa.org/octime_acp.html)
 
 """
+import os
+import logging
 import flask
+import requests
 from flask import request
 import arrow  # Replacement for datetime, based on moment.js
 import acp_times  # Brevet time calculations
-import config
-import logging
-from mypymongo import brevet_insert, brevet_find
-
 import json
 
 ###
 # Globals
 ###
 app = flask.Flask(__name__)
-CONFIG = config.configuration()
+app.debug = True if "DEBUG" not in os.environ else os.environ["DEBUG"]
+port_num = True if "PORT" not in os.environ else os.environ["PORT"]
+app.logger.setLevel(logging.DEBUG)
+
+
+### API Callers ###
+
+API_ADDR = os.environ["API_ADDR"]
+API_PORT = os.environ["API_PORT"]
+API_URL = f"http://{API_ADDR}:{API_PORT}/api/"
+
+def brevet_insert(brevet_dist, start_time, checkpoints):
+    """
+    Inserts a new table into the database by calling the API.
+    Inputs a brevet (string), a start time (string), and checkpoints (list of dictionaries)
+
+    Returns the unique ID assigned to the document by mongo (primary key)
+
+    This is copied from ToDoListRESTful and modified 
+    """
+    _id = requests.post(f"{API_URL}/brevets", json={"length": brevet_dist, "start_time": start_time, "checkpoints": checkpoints}).json()
+    return _id
+
+def brevet_find():
+    """
+    Obtains the newest document in the "tables" collection in database by calling the API.
+
+    Returns brevet (string), start time(string), and checkpoints (list of dictionaries)
+    as a tuple.
+
+    This is copied from ToDoListRESTful and modified 
+    """
+    brevets = requests.get(f"{API_URL}/brevets").json()
+
+    brevet = brevets[-1]
+    return brevet["length"], brevet["start_time"], brevet["checkpoints"]  
 
 ###
 # Pages
@@ -65,8 +99,8 @@ def insert_brevet():
         # if successful, input_json is automatically parsed into a python dictionary!
         
         # Because input_json is a dictionary, we can do this:
-        brevet = input_json["brevet"] # Should be a string
-        start = input_json["start"] # Should be a formatted string
+        brevet = input_json["length"] # Should be a string
+        start = input_json["start_time"] # Should be a formatted string
         checkpoints = input_json["checkpoints"]  # Should be a list of dicts
 
         # If the user didn't input any checkpoints, return an error message
@@ -109,7 +143,7 @@ def fetch_brevet():
         # the function in mypymongo.py
         brevet, start, checkpoints = brevet_find()
         return flask.jsonify(
-                result={"brevet": brevet, "start": start, "checkpoints": checkpoints}, 
+                result={"length": brevet, "start_time": start, "checkpoints": checkpoints}, 
                 status=1,
                 message="Successfully fetched a table!")
     except:
@@ -148,10 +182,6 @@ def _calc_times():
 
 #############
 
-app.debug = CONFIG.DEBUG
-if app.debug:
-    app.logger.setLevel(logging.DEBUG)
-
 if __name__ == "__main__":
-    print("Opening for global access on port {}".format(CONFIG.PORT))
-    app.run(port=CONFIG.PORT, host="0.0.0.0")
+    # may write a fail case for this if you want
+    app.run(port=port_num, host="0.0.0.0")

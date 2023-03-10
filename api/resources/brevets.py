@@ -3,16 +3,43 @@ Resource: Brevets
 """
 from flask import Response, request
 from flask_restful import Resource
+from datetime import datetime
 
 # You need to implement this in database/models.py
 from database.models import Brevet
+from database.models import Checkpoint
 
 class Brevets(Resource):
     def get(self):
-        pass
-    
+        json_object = Brevet.objects().to_json()
+        return Response(json_object, mimetype="application/json", status=200)
+
     def post(self):
-        pass
+        # Read the entire request body as a JSON
+        # This will fail if the request body is NOT a JSON.
+        input_json = request.json
+
+        ## Because input_json is a dictionary, we can do this:
+        brevet = input_json["length"] # Should be a string
+        start = input_json["start_time"] # Should be a list of dictionaries
+        # start = datetime.strptime(start, '%Y-%m-%dT%H:%M')
+        checkpoints = input_json["checkpoints"]
+        
+        check_objects = []
+        for checkpoint in checkpoints:
+            km = checkpoint["km"]
+            mi = checkpoint["miles"]
+            loc = checkpoint["location"]
+            star = checkpoint["open"]
+            # star = datetime.strptime(star, '%Y-%m-%dT%H:%M')
+            clos = checkpoint["close"]
+            # clos = datetime.strptime(clos, '%Y-%m-%dT%H:%M')
+            new_check_item = Checkpoint(km=km, miles=mi, location=loc, open=star, close=clos)
+            check_objects.append(new_check_item)
+
+        # result = Brevet(**input_json).save()
+        result = Brevet(length=brevet, start_time=start, checkpoints=check_objects).save()
+        return {'_id': str(result.id)}, 200
 
 
 # MongoEngine queries:

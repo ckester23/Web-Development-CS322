@@ -209,8 +209,8 @@
 
                      // Construct the data we will be sending Flask
                      var new_time_table = {
-                        "brevet": brevet, 
-                        "start": start,
+                        "length": brevet, 
+                        "start_time": start,
                         "checkpoints": checkpoints};
                      // Perfect! Now we have all the information that the user's entered
                      // into the form. All we have to do is send a POST request to have
@@ -268,9 +268,10 @@
                                  console.log("Successfully fetched: ", data);
 
                                  // Set the brevet and start values
-                                 var brevet = data.result.brevet
+                                 var brevet = data.result.length
                                  document.querySelector('#brevet_dist_km').value = brevet;
-                                 var start = data.result.start
+                                 var start = data.result.start_time
+                                 console.log(start)
                                  document.getElementById("begin_date").value = start;
                                  
                                  // grab the list of checkpoints from passed data. get the length
@@ -292,8 +293,8 @@
                                        // fill in values from data (checkpoint list)
                                        litem.find("input[name='km']").val(checkpoints[index].km);
                                        litem.find("input[name='miles']").val(checkpoints[index].miles);
-                                       litem.find("input[name='open']").val(checkpoints[index].open);
-                                       litem.find("input[name='close']").val(checkpoints[index].close);
+                                       // litem.find("input[name='open']").val(checkpoints[index].open);
+                                       // litem.find("input[name='close']").val(checkpoints[index].close);
                                        litem.find("input[name='location']").val(checkpoints[index].location);
                                     }
                                  });
