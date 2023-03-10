@@ -3,6 +3,7 @@ Cheyanne Kester
 This project expands on Project 5 with the addition of a RESTful API!
 
 To use docker compose to build and run this project:
+Navigate in your terminal to the project-6 main directory
 `docker compose up --build` (you may add `-d` to the end if you wish to use detached mode)
 then navigate to `localhost:5002`
 
