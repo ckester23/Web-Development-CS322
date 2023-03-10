@@ -1,5 +1,7 @@
 """
 Brevets RESTful API
+
+Credit: I Copied and modified the flask_api from ToDoListRESTful
 """
 import logging
 import os
@@ -16,9 +18,14 @@ connect(host=f"mongodb://{os.environ['MONGODB_HOSTNAME']}:27017/brevetsdb")
 
 # Start Flask app and Api here:
 app = Flask(__name__)
+
+# python lets us to if else statements on a single line
+# verify that the env variables exist before setting them
 app.debug = True if "DEBUG" not in os.environ else os.environ["DEBUG"]
 port_num = True if "PORT" not in os.environ else os.environ["PORT"]
 app.logger.setLevel(logging.DEBUG)
+
+# instantiate the API
 api = Api(app)
 
 # Bind resources to paths here:

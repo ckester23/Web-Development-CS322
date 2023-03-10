@@ -23,13 +23,14 @@ app.logger.setLevel(logging.DEBUG)
 
 ### API Callers ###
 
+# Get neccessary info from env variables
 API_ADDR = os.environ["API_ADDR"]
 API_PORT = os.environ["API_PORT"]
 API_URL = f"http://{API_ADDR}:{API_PORT}/api/"
 
 def brevet_insert(brevet_dist, start_time, checkpoints):
     """
-    Inserts a new table into the database by calling the API.
+    Inserts a new brevet into the database by calling the API.
     Inputs a brevet (string), a start time (string), and checkpoints (list of dictionaries)
 
     Returns the unique ID assigned to the document by mongo (primary key)
@@ -62,7 +63,6 @@ def brevet_find():
 def index():
     app.logger.debug("Main page entry")
     return flask.render_template('calc.html')
-
 
 @app.errorhandler(404)
 def page_not_found(error):

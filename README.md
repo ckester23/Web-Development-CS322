@@ -1,72 +1,62 @@
 # UOCIS322 - Project 6 #
-Brevet time calculator with MongoDB, and a RESTful API!
+Cheyanne Kester
+This project expands on Project 5 with the addition of a RESTful API!
 
-Read about MongoEngine and Flask-RESTful before you start: [http://docs.mongoengine.org/](http://docs.mongoengine.org/), [https://flask-restful.readthedocs.io/en/latest/](https://flask-restful.readthedocs.io/en/latest/).
+To use docker compose to build and run this project:
+`docker compose up --build` (you may add `-d` to the end if you wish to use detached mode)
+then navigate to `localhost:5002`
 
-## Before you begin
-You *HAVE TO* copy `.env-example` into `.env` and specify your container port numbers there!
-Note that the default values (5000 and 5000) will work!
+To turn the project off:
+`^C`
+`docker compose down`
 
-*DO NOT PLACE LOCAL PORTS IN YOUR COMPOSE FILE!*
+## The Application - Breakdown
+P4: This is an application to calculate and display the Open and Close times of checkpoints along a bicycle race of a certain distance, called the Brevet distance. A user should be able to select their desired Brevet distance by using the `Distance` drop down menu, and select their start date and time using the box with the words `Begins at` next to it. After the user has made these selections, they can then input checkpoints in the `Km` or `Miles` column, and the application will display the Open and Close date and times for each checkpoint. 
 
-## Overview
+P5: With the new database functionality, we have two new buttons: `Display` and `Submit`.
+`Display` will pull the most recent table from the mongo database, and fill in the values on the webpage without a reload.
+`Submit` will take the current table on the webpage, and insert it into the database, then clear the webpage's table, without reloading. 
 
-You will reuse your code from Project 5, which already has two services:
+P6: We replace the database interaction in `/brevets` with an all-new API in the `/api` directory. This includes two resources: `Brevet` and `Brevets` in the `/api/resources` folder, as well as two models `Brevet` and `Checkpoint` in `models.py`. 
 
-* Brevets
-	* The entire web service
-* MongoDB
 
-For this project, you will re-organize `Brevets` into two separate services:
+## What we had to do
+### Write Tests 
+P4: Firstly, we must write 5 test cases in `test_acp_times.py` for the algorithm file `acp_times.py`. I followed the procedure that Ali showed us in lab on Friday the 17th. I made a test function for each possible brevet distance, and within each I tested checkpoints for every 50 km. For example, the test for brevet 1000 tested 21 different checkpoints.
 
-* Web (Front-end)
-	* Time calculator (basically everything you had in project 4)
-* API (Back-end)
-	* A RESTful service to expose/store structured data in MongoDB.
+P5: Secondly, we had to write 2 tests in `test_mypymongo.py` for the database interaction file `mypymongo.py`. I once again followed the general hints that Ali gave in lab, and was able to copy and alter some code from `test_acp_times.py`. The first test is to ensure the `brevet_insert` function properly inserts a table into the database, by checking that the tabke was assigned an id by MongoDB. The second test is to ensure the `bevet_find` function properly fetches the most recent table from the database, this test was essentially identical to the previous one, starting with inserting a table to the db, but instead of checking the id of the table we insert, we made sure the fetched table was the same as the one we inserted.
 
-## Tasks
+P6: Did not require new tests, and in fact deleted the `test_mypymongo.py` file. 
 
-* Implement a RESTful API in `api/`:
-	* Write a data schema using MongoEngine for Checkpoints and Brevets:
-		* `Checkpoint`:
-			* `distance`: float, required, (checkpoint distance in kilometers), 
-			* `location`: string, optional, (checkpoint location name), 
-			* `open_time`: datetime, required, (checkpoint opening time), 
-			* `close_time`: datetime, required, (checkpoint closing time).
-		* `Brevet`:
-			* `length`: float, required, (brevet distance in kilometers),
-			* `start_time`: datetime, required, (brevet start time),
-			* `checkpoints`: list of `Checkpoint`s, required, (checkpoints).
-	* Using the schema, build a RESTful API with the resource `/brevets/`:
-		* GET `http://API:PORT/api/brevets` should display all brevets stored in the database.
-		* GET `http://API:PORT/api/brevet/ID` should display brevet with id `ID`.
-		* POST `http://API:PORT/api/brevets` should insert brevet object in request into the database.
-		* DELETE `http://API:PORT/api/brevet/ID` should delete brevet with id `ID`.
-		* PUT `http://API:PORT/api/brevet/ID` should update brevet with id `ID` with object in request.
+To execute these tests, follow this procedure: 
+`docker compose up --build -d`
+`docker compose exec [SERVICENAME] bash` (my service name is `brevets`; this opens a bash inside the service)
+`sed -i -e 's/\r$//' run_tests.sh` (this prevents weird error, might not be necessary for you)
+`./run_tests.sh`
 
-* Copy over `brevets/` from your completed project 5.
-	* Replace every database related code in `brevets/` with calls to the new API.
-		* Remember: AutoGrader will ensure there is NO CONNECTION between `brevets` and `db` services. `brevets` should only operate through `api` and still function the way it did in project 5.
-		* Hint: Submit should send a POST request to the API to insert, Display should send a GET request, and display the last entry.
-	* Remove `config.py` and adjust `flask_brevets.py` to use the `PORT` and `DEBUG` values specified in env variables (see `docker-compose.yml`).
 
-* Update README.md with API documentation added.
+### Implement Algorithm & Database Interactions
+P4: We had to implement the algorithm in `acp_times.py` so that it would pass the test cases we made. 
+The general idea is that for every checkpoint past a certain number of km (200 km for open time and 600km for close time) we had to incrementally calculate the start and close times. By this I mean that, for open time, every 200 km chunk up to the checkpoint distance had to use a different speed; and for close time, every 600km chunk had to use a different speed. A great example of this is `Example 3` on the website https://rusa.org/pages/acp-brevet-control-times-calculator. 
 
-As always you'll turn in your `credentials.ini` through Canvas.
+P5: Next, we had to implement the `brevet_insert` and `brevet_find` functions in `mypymongo.py`. I was able to copy and modify the `insert_todo` and `get_todo` functions in the example ToDoListApp's `flask_todo.py`. 
 
-## Grading Rubric
+P6: As stated above, We replaced the database interaction in `/brevets` with an all-new API in the `/api` directory. This includes two resources: `Brevet` and `Brevets` in the `/api/resources` folder, as well as two models `Brevet` and `Checkpoint` in `models.py`.
 
-* If your code works as expected: 100 points. This includes:
-    * API routes as outlined above function exactly the way expected,
-    * Web application works as expected in project 5,
-    * README is updated with the necessary details.
 
-* If the front-end service does not work, 20 points will be docked.
+### Update Frontend
+P4: We had to modify the `calc.html` file to send the start time (in the "Begins at" box) and the Brevet distance (in the Distance box) to `flask_brevets.py`. 
 
-* For each of the 5 requests that do not work, 15 points will be docked.
+P5: We had to modify the `calc.html` file to have two new buttons, `Display` and `Submit`, and configure their interactions send the proper data to `flask_brevets.py`.
 
-* If none of the above work, 5 points will be assigned assuming project builds and runs, and `README` is updated. Otherwise, 0 will be assigned.
+### Update Flask to accept the new start time and brevet distance
+P4: Lastly, we had to modify `flask_brevets.py` to accept the start time and brevet distance. I did this by using `request.args.get(what I need)`, as the given code did with getting `km`. Once the file was accepting the arguments, I had to modify a couple of the given code's lines to ensure that start time and brevet distance were being passed into `acp_times.py` correctly. 
 
-## Authors
+P5: Modify `flask_brevets.py` to accept insert_brevet and fetch_brevet requests from `calc.html`.
+
+P6: Did not require much front-end updating besides changing variable names. 
+
+## Authors of Original Overview and Project 
+### (Content from Original README deleted for simplicity)
 
 Michal Young, Ram Durairajan. Updated by Ali Hassani.
