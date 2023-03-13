@@ -29,7 +29,7 @@ app.logger.setLevel(logging.DEBUG)
 api = Api(app)
 
 # Bind resources to paths here:
-api.add_resource( BrevetResource, "/api/brevetresource/<id>")
+api.add_resource( BrevetResource, "/api/brevet/<id>")
 api.add_resource(Brevets, "/api/brevets")
 
 if __name__ == "__main__":
