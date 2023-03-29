@@ -1,4 +1,0 @@
-arrow
-Flask
-nose
-requests
